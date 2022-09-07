@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 void main() {
   runApp(const MyApp());
@@ -48,9 +49,33 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  static const channel = MethodChannel('myWatchChannel');
+
   int _counter = 0;
 
-  void _incrementCounter() {
+  @override
+  void initState() {
+    super.initState();
+    _initFlutterChannel();
+  }
+
+  void _initFlutterChannel() {
+    channel.setMethodCallHandler((call) async {
+      // Receive data from Native
+      switch (call.method) {
+        case "sendCounterToFlutter":
+          setState(() {
+            _counter = call.arguments["data"]["counter"];
+          });
+
+          break;
+        default:
+          break;
+      }
+    });
+  }
+
+  Future<void> _incrementCounter() async {
     setState(() {
       // This call to setState tells the Flutter framework that something has
       // changed in this State, which causes it to rerun the build method below
@@ -59,6 +84,14 @@ class _MyHomePageState extends State<MyHomePage> {
       // called again, and so nothing would appear to happen.
       _counter++;
     });
+    final res = await channel.invokeMethod(
+      "flutterToWatch",
+      {
+        "method": "sendCounterToNative",
+        "data": _counter,
+      },
+    );
+    print('res is $res');
   }
 
   @override
