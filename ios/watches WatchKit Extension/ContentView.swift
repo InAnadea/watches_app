@@ -10,18 +10,53 @@ import SwiftUI
 struct ContentView: View {
     @ObservedObject var viewModel: WatchViewModel = WatchViewModel()
     
+    fileprivate func sendScore() {
+        viewModel.sendDataMessage(
+            for: .sendScoreToFlutter,
+            data: ["score": viewModel.score]
+        )
+    }
+    
+    fileprivate func sendHole() {
+        viewModel.sendDataMessage(
+            for: .sendHoleToFlutter,
+            data: ["hole": viewModel.hole]
+        )
+    }
+    
     var body: some View {
-        VStack {
-            Text("Counter: \(viewModel.counter)")
-                .padding()
-            Button(action: {
-                viewModel.counter += 1
-                viewModel.sendDataMessage(
-                    for: .sendCounterToFlutter,
-                    data: ["counter": viewModel.counter]
-                )
-            }) {
-                Text("+")
+        HStack{
+            VStack {
+                Text("Score: \(viewModel.score)")
+                    .padding()
+                Button(action: {
+                    viewModel.score += 1
+                    sendScore()
+                }) {
+                    Text("+")
+                }
+                Button(action: {
+                    viewModel.score -= 1
+                    sendScore()
+                }) {
+                    Text("-")
+                }.disabled(viewModel.score <= 0)
+            }
+            VStack {
+                Text("Hole: \(viewModel.hole)")
+                    .padding()
+                Button(action: {
+                    viewModel.hole += 1
+                    sendHole()
+                }) {
+                    Text("+")
+                }
+                Button(action: {
+                    viewModel.hole -= 1
+                    sendHole()
+                }) {
+                    Text("-")
+                }.disabled(viewModel.hole <= 1)
             }
         }
     }

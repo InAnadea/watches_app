@@ -10,16 +10,19 @@ import WatchConnectivity
 
 class WatchViewModel: NSObject, ObservableObject {
     var session: WCSession
-    @Published var counter = 0
+    @Published var score = 0
+    @Published var hole = 1
     
     // Add more cases if you have more receive method
     enum WatchReceiveMethod: String {
-        case sendCounterToNative
+        case sendScoreToNative
+        case sendHoleToNative
     }
     
     // Add more cases if you have more sending method
     enum WatchSendMethod: String {
-        case sendCounterToFlutter
+        case sendScoreToFlutter
+        case sendHoleToFlutter
     }
     
     init(session: WCSession = .default) {
@@ -49,8 +52,10 @@ extension WatchViewModel: WCSessionDelegate {
             }
             
             switch enumMethod {
-            case .sendCounterToNative:
-                self.counter = (message["data"] as? Int) ?? 0
+            case .sendScoreToNative:
+                self.score = (message["data"] as? Int) ?? 0
+            case .sendHoleToNative:
+                self.hole = (message["data"] as? Int) ?? 1
             }
         }
     }
